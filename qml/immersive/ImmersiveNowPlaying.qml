@@ -209,8 +209,9 @@ Item {
                 }
 
                 TitleText {
+                    objectName: "immersiveTrackTitle"
                     width: parent.width
-                    height: root.compactHorizontal ? 52 : root.layout.titleHeight
+                    height: root.compactHorizontal ? 52 : Math.max(root.layout.titleHeight, font.pixelSize * 2.6)
                     text: root.shownSong.name
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.Wrap

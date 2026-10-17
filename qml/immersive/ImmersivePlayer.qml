@@ -33,7 +33,7 @@ FocusScope {
     readonly property bool usesPanelLayout: panel.length > 0
     readonly property bool showsSpectrum: Settings.visualizersEnabled && !Settings.circularVisualizer
 
-    readonly property real metadataWidth: Math.max(300, Math.min(400, width * 0.32))
+    readonly property real metadataWidth: nowPlayingWidth
     readonly property real horizontalPadding: Math.max(28, Math.min(64, width * 0.05))
     readonly property real rowSpace: Math.min(1250, width - 2 * horizontalPadding)
     readonly property real gap: Math.max(32, Math.min(72, width * 0.055))

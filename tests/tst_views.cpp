@@ -169,6 +169,41 @@ private slots:
         QTest::failOnWarning(QRegularExpression(QStringLiteral("^(?!(Populating font family aliases|.*QWaylandTextInputv3)).*")));
     }
 
+    void immersiveTitlesUseAvailableWidth()
+    {
+        Rig rig;
+        rig.playSomething();
+        rig.settings.setReduceMotion(true);
+        rig.settings.setImmersivePlayerPanel(QStringLiteral("artwork"));
+        const auto player = rig.show(QStringLiteral("ImmersivePlayer"));
+        QVERIFY(player);
+        for (const QSize size : {QSize(900, 1410), QSize(526, 1000), QSize(724, 410)}) {
+            player->setSize(size);
+            Rig::settle();
+            auto *now = player->findChild<QQuickItem *>(QStringLiteral("immersiveNowPlaying"));
+            auto *title = player->findChild<QQuickItem *>(QStringLiteral("immersiveTrackTitle"));
+            QVERIFY(now && title);
+            Song song;
+            song.name = QStringLiteral("GALAXY! - SLOWED + REVERB (EXTENDED VERSION)");
+            song.artists = QStringLiteral("IMPXSTR");
+            now->setProperty("shownSong", QVariant::fromValue(song));
+            title->setProperty("animateChange", false);
+            QTest::qWait(400);
+            rig.render();
+            QVERIFY(title->width() > 0);
+            QVERIFY(title->width() <= now->width());
+            QVERIFY(title->height() > 0);
+            if (size.width() == 900) {
+                const QString preview = qEnvironmentVariable("SWIFTIFY_TITLE_PREVIEW");
+                if (!preview.isEmpty()) QVERIFY(rig.render().save(preview));
+            }
+            if (size.height() > size.width()) {
+                QVERIFY(title->width() >= now->width() - 1);
+                if (size.width() >= 900) QVERIFY2(!title->property("truncated").toBool(), qPrintable(QStringLiteral("window %1 title %2x%3 text %4 content %5x%6").arg(size.width()).arg(title->width()).arg(title->height()).arg(title->property("text").toString()).arg(title->property("contentWidth").toReal()).arg(title->property("contentHeight").toReal())));
+            }
+        }
+    }
+
     void immersivePanels_data()
     {
         QTest::addColumn<QString>("panel");
