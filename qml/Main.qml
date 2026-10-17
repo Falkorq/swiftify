@@ -10,7 +10,14 @@ ApplicationWindow {
     id: window
 
     property real sidebarWidth: 232
-    readonly property real effectiveSidebarWidth: Math.max(132, Math.min(sidebarWidth, width * 0.28))
+    property real effectiveSidebarWidth: Settings.sidebarCollapsed ? 72 : Math.max(180, Math.min(sidebarWidth, width * 0.28))
+    Behavior on effectiveSidebarWidth {
+        NumberAnimation { duration: Appearance.duration(200); easing.type: Easing.OutCubic }
+    }
+    Shortcut {
+        sequence: "Ctrl+B"
+        onActivated: Settings.sidebarCollapsed = !Settings.sidebarCollapsed
+    }
     readonly property bool inAppWindowControls: !App.macOS && (App.windows ? !Settings.nativeTitleBar : Settings.showWindowControls)
     /// the strip the traffic lights sit in, kept clear above the sidebar
     readonly property real titleBarInset: App.macOS ? Math.max(28, shell.SafeArea.margins.top)
@@ -197,6 +204,8 @@ ApplicationWindow {
         Sidebar {
             id: sidebar
             objectName: "mainSidebar"
+            collapsed: Settings.sidebarCollapsed
+            onToggleCollapsed: Settings.sidebarCollapsed = !Settings.sidebarCollapsed
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
@@ -212,14 +221,18 @@ ApplicationWindow {
             anchors.bottom: parent.bottom
             width: 8
             cursorShape: Qt.SizeHorCursor
+            onDoubleClicked: Settings.sidebarCollapsed = !Settings.sidebarCollapsed
             property real startX
             property real startWidth
             onPressed: (mouse) => {
                 startX = mouse.x + x
-                startWidth = window.sidebarWidth
+                startWidth = Settings.sidebarCollapsed ? 72 : window.sidebarWidth
             }
             onPositionChanged: (mouse) => {
-                window.sidebarWidth = Math.max(132, Math.min(270, startWidth + mouse.x + x - startX))
+                if (!pressed) return
+                const desired = startWidth + mouse.x + x - startX
+                Settings.sidebarCollapsed = desired < 110
+                if (!Settings.sidebarCollapsed) window.sidebarWidth = Math.max(180, Math.min(270, desired))
             }
         }
 

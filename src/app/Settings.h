@@ -37,6 +37,7 @@ class Settings : public QObject {
     Q_PROPERTY(double backdropReactivity READ backdropReactivity WRITE setBackdropReactivity NOTIFY backdropReactivityChanged FINAL)
     Q_PROPERTY(bool debuggingEnabled READ debuggingEnabled WRITE setDebuggingEnabled NOTIFY debuggingEnabledChanged FINAL)
     Q_PROPERTY(bool pinnedPlaylistsExpanded READ pinnedPlaylistsExpanded WRITE setPinnedPlaylistsExpanded NOTIFY pinnedPlaylistsExpandedChanged FINAL)
+    Q_PROPERTY(bool sidebarCollapsed READ sidebarCollapsed WRITE setSidebarCollapsed NOTIFY sidebarCollapsedChanged FINAL)
     Q_PROPERTY(bool allPlaylistsExpanded READ allPlaylistsExpanded WRITE setAllPlaylistsExpanded NOTIFY allPlaylistsExpandedChanged FINAL)
     Q_PROPERTY(QString immersivePlayerPanel READ immersivePlayerPanel WRITE setImmersivePlayerPanel NOTIFY immersivePlayerPanelChanged FINAL)
     Q_PROPERTY(QString sleepTimerFade READ sleepTimerFade WRITE setSleepTimerFade NOTIFY sleepTimerFadeChanged FINAL)
@@ -106,6 +107,8 @@ public:
     void setDebuggingEnabled(bool value);
     bool pinnedPlaylistsExpanded() const { return m_pinnedPlaylistsExpanded; }
     void setPinnedPlaylistsExpanded(bool value);
+    bool sidebarCollapsed() const { return m_sidebarCollapsed; }
+    void setSidebarCollapsed(bool value);
     bool allPlaylistsExpanded() const { return m_allPlaylistsExpanded; }
     void setAllPlaylistsExpanded(bool value);
     QString immersivePlayerPanel() const { return m_immersivePlayerPanel; }
@@ -153,6 +156,7 @@ signals:
     void backdropReactivityChanged();
     void debuggingEnabledChanged();
     void pinnedPlaylistsExpandedChanged();
+    void sidebarCollapsedChanged();
     void allPlaylistsExpandedChanged();
     void immersivePlayerPanelChanged();
     void sleepTimerFadeChanged();
@@ -185,6 +189,7 @@ private:
     double m_backdropReactivity = 0.3;
     bool m_debuggingEnabled = false;
     bool m_pinnedPlaylistsExpanded = false;
+    bool m_sidebarCollapsed = false;
     bool m_allPlaylistsExpanded = false;
     QString m_immersivePlayerPanel = QStringLiteral("lyrics");
     QString m_sleepTimerFade = QStringLiteral("finalSeconds");

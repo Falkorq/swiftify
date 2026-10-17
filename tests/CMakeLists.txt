@@ -51,3 +51,7 @@ if(Python3_FOUND)
     add_test(NAME qml_statements
         COMMAND Python3::Interpreter ${CMAKE_CURRENT_SOURCE_DIR}/check_qml_statements.py ${PROJECT_SOURCE_DIR}/qml)
 endif()
+
+
+swiftify_test(tst_sidebar FakeCore.h ViewRig.h)
+target_link_libraries(tst_sidebar PRIVATE swiftify_appplugin Qt6::GuiPrivate)

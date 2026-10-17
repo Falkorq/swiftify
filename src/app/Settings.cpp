@@ -129,6 +129,7 @@ void Settings::load()
     }
     m_debuggingEnabled = stored<bool>(m_store, "debuggingEnabled", m_debuggingEnabled);
     m_pinnedPlaylistsExpanded = stored<bool>(m_store, "pinnedPlaylistsExpanded", m_pinnedPlaylistsExpanded);
+    m_sidebarCollapsed = stored<bool>(m_store, "sidebarCollapsed", false);
     m_allPlaylistsExpanded = stored<bool>(m_store, "allPlaylistsExpanded", m_allPlaylistsExpanded);
     {
         const QString raw = stored<QString>(m_store, "immersivePlayerPanel", m_immersivePlayerPanel);
@@ -421,6 +422,15 @@ void Settings::setNativeTitleBar(bool value)
     m_nativeTitleBar = value;
     m_store.setValue(QStringLiteral("nativeTitleBar"), value);
     emit nativeTitleBarChanged();
+}
+
+void Settings::setSidebarCollapsed(bool value)
+{
+    if (m_sidebarCollapsed == value) return;
+    m_sidebarCollapsed = value;
+    m_store.setValue(QStringLiteral("sidebarCollapsed"), value);
+    m_store.sync();
+    emit sidebarCollapsedChanged();
 }
 
 void Settings::setTrayIcon(bool value)

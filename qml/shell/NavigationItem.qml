@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
+import QtQuick.Controls.Basic
 import Swiftify
 
 // a navigation drawer row: material 3's pill indicator behind the selected
@@ -10,6 +11,7 @@ import Swiftify
 T.AbstractButton {
     id: root
 
+    property bool compact: false
     property string symbol
     property url artworkUrl
     property bool selected: false
@@ -21,7 +23,11 @@ T.AbstractButton {
     property alias trailing: trailingSlot.data
     property int indent: 0
 
-    implicitHeight: 40
+    implicitHeight: compact ? 48 : 40
+    Accessible.name: text
+    ToolTip.visible: (hovered || visualFocus) && (compact || label.truncated)
+    ToolTip.text: text
+    ToolTip.delay: 450
     hoverEnabled: true
     focusPolicy: Qt.TabFocus
 
@@ -89,7 +95,7 @@ T.AbstractButton {
     contentItem: Item {
         Row {
             anchors.left: parent.left
-            anchors.leftMargin: 16 + root.indent
+            anchors.leftMargin: root.compact ? Math.max(0, (root.width - (root.showArtwork ? 40 : 24)) / 2) : 16 + root.indent
             anchors.right: trailingSlot.left
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
@@ -127,13 +133,15 @@ T.AbstractButton {
             ArtworkImage {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: root.showArtwork
-                width: 24
-                height: 24
+                width: root.compact ? 40 : 24
+                height: width
                 radius: 5
                 source: root.artworkUrl
             }
 
             StyledText {
+                id: label
+                visible: !root.compact
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width - 36
                 text: root.text
@@ -146,6 +154,7 @@ T.AbstractButton {
 
         Row {
             id: trailingSlot
+            visible: !root.compact
             anchors.right: parent.right
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter

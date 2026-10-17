@@ -9,6 +9,21 @@ import Swiftify
 Item {
     id: root
 
+    property bool collapsed: false
+    signal toggleCollapsed()
+
+    IconButton {
+        id: collapseButton
+        objectName: "sidebarCollapseButton"
+        anchors.top: parent.top
+        x: root.collapsed ? (root.width - width) / 2 : 12
+        size: 40
+        symbol: root.collapsed ? "menu" : "menu_open"
+        tooltip: root.collapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"
+        Accessible.name: tooltip
+        onClicked: root.toggleCollapsed()
+    }
+
     property playlist menuPlaylist
     readonly property bool menuPlaylistEditable: menuPlaylist.isLocal || menuPlaylist.isCollaborative
         || (Library.profileId.length > 0 && menuPlaylist.ownerId === Library.profileId)
@@ -20,11 +35,14 @@ Item {
     ListView {
         id: list
         anchors.fill: parent
+        anchors.topMargin: collapseButton.height + 8
+        anchors.leftMargin: root.collapsed ? 8 : 0
+        anchors.rightMargin: root.collapsed ? 8 : 0
         anchors.bottomMargin: settingsButton.height + 16
         clip: true
         boundsBehavior: Flickable.StopAtBounds
         spacing: 2
-        model: Settings.allPlaylistsExpanded ? Library.playlists : null
+        model: (root.collapsed || Settings.allPlaylistsExpanded) ? Library.playlists : null
         ScrollBar.vertical: StyledScrollBar {}
 
         header: Column {
@@ -35,6 +53,7 @@ Item {
             Item { width: 1; height: 8 }
 
             NavigationItem {
+                compact: root.collapsed
                 width: parent.width
                 text: "Home"
                 iconShape: "cookie9"
@@ -43,6 +62,7 @@ Item {
                 onClicked: Library.showHome()
             }
             NavigationItem {
+                compact: root.collapsed
                 width: parent.width
                 text: "Search"
                 iconShape: "clover4"
@@ -52,19 +72,22 @@ Item {
             }
 
             SectionLabel {
+                visible: !root.collapsed
+                height: visible ? implicitHeight : 0
                 width: parent.width
                 text: "Library"
             }
             NavigationItem {
+                compact: root.collapsed
                 width: parent.width
                 text: "Songs"
-                iconShape: "heart"
-                keepsShape: true
-                symbol: "music_note"
+                iconShape: "cookie9"
+                symbol: "favorite"
                 selected: root.isSelected(Library.Page.Songs)
                 onClicked: Library.showSavedSongs()
             }
             NavigationItem {
+                compact: root.collapsed
                 width: parent.width
                 text: "Local Files"
                 iconShape: "clamShell"
@@ -77,6 +100,8 @@ Item {
             }
 
             SectionLabel {
+                visible: !root.collapsed
+                height: visible ? implicitHeight : 0
                 width: parent.width
                 text: "Playlists"
                 trailing: IconButton {
@@ -91,6 +116,7 @@ Item {
             }
 
             NavigationItem {
+                compact: root.collapsed
                 width: parent.width
                 text: "Pinned Playlists"
                 iconShape: "flower"
@@ -110,11 +136,21 @@ Item {
                 }
             }
 
+            NavigationItem {
+                visible: root.collapsed
+                height: visible ? 48 : 0
+                width: parent.width
+                compact: true
+                text: "New playlist"
+                symbol: "add"
+                onClicked: UiState.beginCreatePlaylist()
+            }
+
             // the pinned group opens and shuts on a spring: past its height
             // and back opening, and a rebound shutting
             Item {
                 width: parent.width
-                height: Settings.pinnedPlaylistsExpanded ? pinned.implicitHeight : 0
+                height: !root.collapsed && Settings.pinnedPlaylistsExpanded ? pinned.implicitHeight : 0
                 visible: height > 0.5
                 clip: true
 
@@ -153,6 +189,7 @@ Item {
             }
 
             NavigationItem {
+                compact: root.collapsed
                 width: parent.width
                 text: "All Playlists"
                 iconShape: "bun"
@@ -173,7 +210,7 @@ Item {
             }
 
             StyledText {
-                Reveal.shown: Settings.allPlaylistsExpanded && Library.playlists.count === 0
+                Reveal.shown: !root.collapsed && Settings.allPlaylistsExpanded && Library.playlists.count === 0
                 leftPadding: 28
                 height: 28
                 text: "No playlists"
@@ -250,6 +287,7 @@ Item {
 
         required property playlist playlist
 
+        compact: root.collapsed
         text: playlist.name
         showArtwork: true
         artworkUrl: playlist.artworkUrl
@@ -306,6 +344,7 @@ Item {
     // the settings at the sidebar's foot, the account among them
     NavigationItem {
         id: settingsButton
+        compact: root.collapsed
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
